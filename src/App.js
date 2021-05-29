@@ -1,31 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import get_covid_data from "./redux/actions";
 
 const App = () => {
-  const [data, setData] = useState(null);
+  const dispatch = useDispatch();
+  const { loading, covidData, error } = useSelector(state => state.covidData);
 
   useEffect(() => {
-    fetch('https://covidnigeria.herokuapp.com/api')
-      .then(res => res.json())
-      .then(result => setData(result.data))
-  }, []);
+    dispatch(get_covid_data());
+  }, [dispatch]);
 
-  console.log(data);
   return (
     <div className="container">
       <main className="main">
         <h1 className="title"><div>Covid-19</div> In Nigeria</h1>
-        {!data && (<div className="description">Loading...</div>)}
-        {data && (
+        {loading && (<div className="description">Loading...</div>)}
+        {error && (<div className="description">{error}</div>)}
+        {covidData && (
           <>
             <div className="description">
-              <p>Total Samples Tested: {data.totalSamplesTested}</p>
-              <p>Total Confirmed Cases: {data.totalConfirmedCases}</p>
-              <p>Total Active Cases: {data.totalActiveCases}</p>
-              <p>Discharged: {data.discharged}</p>
-              <p>Death: {data.death}</p>
+              <p>Total Samples Tested: {covidData.totalSamplesTested}</p>
+              <p>Total Confirmed Cases: {covidData.totalConfirmedCases}</p>
+              <p>Total Active Cases: {covidData.totalActiveCases}</p>
+              <p>Discharged: {covidData.discharged}</p>
+              <p>Death: {covidData.death}</p>
             </div>
             <div className="grid">
-              {data.states.map((state) => (
+              {covidData.states.map((state) => (
                 <div key={state._id} className="card">
                   <h2>State: {state.state}</h2>
                   <p>Confirmed cases: {state.confirmedCases}</p>
